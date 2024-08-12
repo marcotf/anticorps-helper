@@ -1,8 +1,13 @@
 "use server";
 
-// import { lucia } from "@/lib/auth";
+import { lucia } from "@/lib/auth";
 import { Paths } from "@/lib/constants";
 import { handleFieldError } from "@/lib/utils";
+import { db } from "@/server/db";
+import { users } from "@/server/db/schema";
+import { eq } from "drizzle-orm";
+import { Scrypt } from "lucia";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -60,18 +65,33 @@ export async function loginAction(
     };
   }
 
-  let redirectPath = Paths.Gateway; // Constant value
+  const redirectPath = Paths.Home; // Constant value
   try {
-    // const { user, session } = await api.auth.login.mutate(parsed.data); // Call the API
-    // // Handle frontend session logic
-    // const sessionCookie = lucia.createSessionCookie(session.id);
-    // cookies().set(
-    //   sessionCookie.name,
-    //   sessionCookie.value,
-    //   sessionCookie.attributes,
-    // );
-    // // Change redirect path if needed
-    // if (!user.emailVerified) redirectPath = Paths.VerifyEmail;
+    const { email, password } = parsed.data;
+
+    const existingUser = await db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
+
+    if (!existingUser?.hashedPassword) {
+      throw new Error("Incorrect email or password");
+    }
+
+    const validPassword = await new Scrypt().verify(
+      existingUser.hashedPassword,
+      password,
+    );
+    if (!validPassword) {
+      throw new Error("Incorrect email or password");
+    }
+
+    const session = await lucia.createSession(existingUser.id, {});
+    const sessionCookie = lucia.createSessionCookie(session.id);
+    cookies().set(
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes,
+    );
   } catch (error) {
     return { ...state, status: "error", message: (error as Error).message };
   }

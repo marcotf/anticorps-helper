@@ -5,8 +5,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-// import { validateRequest } from "@/lib/auth/validate-request";
-import { APP_TITLE } from "@/lib/constants";
+import { validateRequest } from "@/lib/auth/validate-request";
+import { APP_TITLE, Paths } from "@/lib/constants";
+import { redirect } from "next/navigation";
 import { LoginForm } from "./login-form";
 
 export const metadata = {
@@ -15,9 +16,9 @@ export const metadata = {
 };
 
 export default async function LoginPage() {
-  // const { user } = await validateRequest();
+  const { user } = await validateRequest();
 
-  // if (user) redirect(Paths.Gateway);
+  if (user) redirect(Paths.Home);
 
   return (
     <Card className="w-full max-w-md">

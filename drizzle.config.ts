@@ -8,5 +8,5 @@ export default {
   dbCredentials: {
     url: env.DATABASE_URL,
   },
-  tablesFilter: ["anticorps-helper_*"],
+  tablesFilter: ["anticorps_helper_*"],
 } satisfies Config;

@@ -4,14 +4,6 @@ export const TEST_DB_PREFIX = "test_ff20";
 export const EMAIL_SENDER = '"FF20" <noreply@ff20.com>';
 
 export enum Paths {
-  Gateway = "/",
-  Homepage = "/homepage",
+  Home = "/",
   Login = "/login",
-  Signup = "/signup",
-  Onboarding = "/onboarding",
-  VerifyEmail = "/verify-email",
-  ResetPassword = "/reset-password",
-  Setup = "/setup",
-  Dashboard = "/dashboard",
-  Members = "/members",
 }

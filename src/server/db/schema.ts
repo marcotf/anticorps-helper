@@ -6,7 +6,6 @@ import {
   index,
   integer,
   pgTableCreator,
-  serial,
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -17,12 +16,12 @@ import {
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = pgTableCreator((name) => `anticorps-helper_${name}`);
+export const createTable = pgTableCreator((name) => `anticorps_helper_${name}`);
 
 export const antibodies = createTable(
-  "antibody",
+  "antibodies",
   {
-    id: serial("id").primaryKey(),
+    id: varchar("id", { length: 21 }).primaryKey(),
     name: varchar("name", { length: 256 }),
     quantity: integer("quantity"),
     stock: integer("stock"),
@@ -35,5 +34,37 @@ export const antibodies = createTable(
   },
   (example) => ({
     nameIndex: index("name_idx").on(example.name),
+  }),
+);
+
+export const users = createTable(
+  "users",
+  {
+    id: varchar("id", { length: 21 }).primaryKey(),
+    email: varchar("email", { length: 255 }).unique().notNull(),
+    hashedPassword: varchar("hashed_password", { length: 255 }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" }).$onUpdate(
+      () => new Date(),
+    ),
+  },
+  (t) => ({
+    emailIdx: index("user_email_idx").on(t.email),
+  }),
+);
+export type User = typeof users.$inferSelect;
+
+export const sessions = createTable(
+  "sessions",
+  {
+    id: varchar("id", { length: 255 }).primaryKey(),
+    userId: varchar("user_id", { length: 21 }).notNull(),
+    expiresAt: timestamp("expires_at", {
+      withTimezone: true,
+      mode: "date",
+    }).notNull(),
+  },
+  (t) => ({
+    userIdx: index("session_user_idx").on(t.userId),
   }),
 );
