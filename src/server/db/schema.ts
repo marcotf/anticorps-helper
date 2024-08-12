@@ -4,6 +4,7 @@
 import { sql } from "drizzle-orm";
 import {
   index,
+  integer,
   pgTableCreator,
   serial,
   timestamp,
@@ -18,19 +19,21 @@ import {
  */
 export const createTable = pgTableCreator((name) => `anticorps-helper_${name}`);
 
-export const posts = createTable(
-  "post",
+export const antibodies = createTable(
+  "antibody",
   {
     id: serial("id").primaryKey(),
     name: varchar("name", { length: 256 }),
+    quantity: integer("quantity"),
+    stock: integer("stock"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-      () => new Date()
+      () => new Date(),
     ),
   },
   (example) => ({
     nameIndex: index("name_idx").on(example.name),
-  })
+  }),
 );
