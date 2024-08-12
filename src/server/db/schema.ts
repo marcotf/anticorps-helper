@@ -22,9 +22,9 @@ export const antibodies = createTable(
   "antibodies",
   {
     id: varchar("id", { length: 21 }).primaryKey(),
-    name: varchar("name", { length: 256 }),
-    quantity: integer("quantity"),
-    stock: integer("stock"),
+    name: varchar("name", { length: 256 }).notNull(),
+    quantity: integer("quantity").notNull(),
+    stock: integer("stock").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
@@ -36,6 +36,7 @@ export const antibodies = createTable(
     nameIndex: index("name_idx").on(example.name),
   }),
 );
+export type Antibody = typeof antibodies.$inferSelect;
 
 export const users = createTable(
   "users",
